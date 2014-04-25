@@ -41,16 +41,6 @@ namespace Gini
     
     static partial class Ini
     {
-        public static IEnumerable<IGrouping<string, KeyValuePair<string, string>>> Parse(string ini)
-        {
-            return Parse(ini, KeyValuePair.Create);
-        }
-
-        public static IEnumerable<IGrouping<string, T>> Parse<T>(string ini, Func<string, string, T> settingSelector)
-        {
-            return Parse(ini, (_, k, v) => settingSelector(k, v));
-        }
-
         static class Parser
         {
             static readonly Regex Regex;
@@ -60,14 +50,14 @@ namespace Gini
 
             static Parser()
             {
-                var re = Regex = 
+                var re = Regex =
                     new Regex(@"^ *(\[(?<s>[a-z0-9-._][a-z0-9-._ ]*)\]|(?<k>[a-z0-9-._][a-z0-9-._ ]*)= *(?<v>[^\r\n]*))\s*$",
                         RegexOptions.Multiline
                         | RegexOptions.IgnoreCase
                         | RegexOptions.CultureInvariant);
                 SectionNumber = re.GroupNumberFromName("s");
-                KeyNumber     = re.GroupNumberFromName("k");
-                ValueNumber   = re.GroupNumberFromName("v");
+                KeyNumber = re.GroupNumberFromName("k");
+                ValueNumber = re.GroupNumberFromName("v");
             }
 
             // ReSharper disable once MemberHidesStaticFromOuterClass
@@ -79,6 +69,16 @@ namespace Gini
                                        g[KeyNumber].Value.TrimEnd(),
                                        g[ValueNumber].Value.TrimEnd());
             }
+        }
+
+        public static IEnumerable<IGrouping<string, KeyValuePair<string, string>>> Parse(string ini)
+        {
+            return Parse(ini, KeyValuePair.Create);
+        }
+
+        public static IEnumerable<IGrouping<string, T>> Parse<T>(string ini, Func<string, string, T> settingSelector)
+        {
+            return Parse(ini, (_, k, v) => settingSelector(k, v));
         }
 
         public static IEnumerable<IGrouping<string, T>> Parse<T>(string ini, Func<string, string, string, T> settingSelector)
