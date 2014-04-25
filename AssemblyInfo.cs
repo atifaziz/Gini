@@ -10,6 +10,12 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
+#if DEBUG
+[assembly: AssemblyConfiguration("DEBUG")]
+#else
+[assembly: AssemblyConfiguration("RELEASE")]
+#endif
+
 [assembly: CLSCompliant(true)]
 [assembly: ComVisible(false)]
 
