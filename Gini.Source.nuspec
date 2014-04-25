@@ -10,6 +10,7 @@
         <projectUrl>https://github.com/atifaziz/Gini</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>Single C# class to parse INI file format.</description>
+        <tags>ini</tags>
     </metadata>
     <files>
         <file src="Ini.cs" target="content\net35-client\App_Packages\Gini\Ini.cs" />
