@@ -354,12 +354,12 @@ namespace Gini
 
         sealed class Config<T> : DynamicObject
         {
-            readonly IDictionary<string, T> _data;
+            readonly IDictionary<string, T> _entries;
 
-            public Config(IDictionary<string, T> data)
+            public Config(IDictionary<string, T> entries)
             {
-                Debug.Assert(data != null);
-                _data = data;
+                Debug.Assert(entries != null);
+                _entries = entries;
             }
 
             public override bool TryGetMember(GetMemberBinder binder, out object result)
@@ -380,7 +380,7 @@ namespace Gini
             object Find(string name)
             {
                 T value;
-                return _data.TryGetValue(name, out value) ? value : default(T);
+                return _entries.TryGetValue(name, out value) ? value : default(T);
             }
         }
     }
