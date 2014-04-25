@@ -14,7 +14,6 @@
         <tags>ini</tags>
     </metadata>
     <files>
-        <file src="Ini.cs" target="content\net35-client\App_Packages\Gini\Ini.cs" />
-        <file src="Ini.Dynamic.cs" target="content\net40-client\App_Packages\Gini\Ini.Dynamic.cs" />
+        <file src="Ini.cs" target="content\App_Packages\Gini\Ini.cs" />
     </files>
 </package>
