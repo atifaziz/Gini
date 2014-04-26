@@ -349,6 +349,7 @@ namespace Gini
 
         public static dynamic ParseFlatObject(string ini, Func<string, string, string> keyMerger, IEqualityComparer<string> comparer)
         {
+            if (keyMerger == null) throw new ArgumentNullException("keyMerger");
             return new Config<string>(ParseFlatHash(ini, keyMerger, comparer));
         }
 
@@ -364,6 +365,7 @@ namespace Gini
 
             public override bool TryGetMember(GetMemberBinder binder, out object result)
             {
+                if (binder == null) throw new ArgumentNullException("binder");
                 result = Find(binder.Name);
                 return true;
             }
