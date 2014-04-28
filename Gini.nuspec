@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>Gini</id>
+        <version>1.0.0</version>
+        <title>INI Parser</title>
+        <authors>Atif Aziz</authors>
+        <owners>Atif Aziz</owners>
+        <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
+        <projectUrl>https://github.com/atifaziz/Gini</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>INI file format parser.</description>
+        <copyright>Copyright (c) 2013 Atif Aziz. All rights reserved.</copyright>
+        <tags>ini</tags>
+    </metadata>
+    <files>
+        <file src="bin\net-3.5\Release\*" target="lib\net35" />
+        <file src="bin\net-4.0\Release\*" target="lib\net40" />
+        <file src="*.cs" target="src" />
+        <file src="COPYING.txt" target="COPYING.txt" />
+    </files>
+</package>
