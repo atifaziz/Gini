@@ -5,8 +5,8 @@ for %%i in (NuGet.exe) do set nuget=%%~dpnx$PATH:i
 if "%nuget%"=="" goto :nonuget
 cd "%~dp0"
 call build /v:m ^
-&& NuGet pack Gini.Source.nuspec ^
-&& NuGet pack Gini.nuspec -Symbols
+ && NuGet pack Gini.Source.nuspec ^
+ && NuGet pack Gini.nuspec -Symbols
 goto :EOF
 
 :nonuget

@@ -7,10 +7,10 @@ if not exist "%MSBUILD%" (
     echo machine, which is required to build the solution.
     exit /b 1
 )
-   call :msbuild 3.5 Debug   %* ^
-&& call :msbuild 3.5 Release %* ^
-&& call :msbuild 4.0 Debug   %* ^
-&& call :msbuild 4.0 Release %*
+ call    :msbuild 3.5 Debug   %* ^
+ && call :msbuild 3.5 Release %* ^
+ && call :msbuild 4.0 Debug   %* ^
+ && call :msbuild 4.0 Release %*
 goto :EOF
 
 :msbuild
