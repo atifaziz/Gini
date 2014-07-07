@@ -93,7 +93,7 @@ The output is as follows:
     database.port = 143
     database.file = payroll.dat
 
-If Gini is compiled with the `GINI_DYNAMIC` conditional compilation symbole defined then it adds the `ParseObject` method that parses the INI file format into a dynamic object:
+If Gini is compiled with the `GINI_DYNAMIC` conditional compilation symbol defined then it adds the `ParseObject` method that parses the INI file format into a dynamic object:
 
     const string ini = @"
         ; last modified 1 April 2001 by John Doe
@@ -126,7 +126,7 @@ The output is:
 
 Note that the lookup of properties on the dynamic object is case-insensitive.
 
-Like there `ParseFlatHash` for `ParseFlat`, there is `ParseFlatObject` for `ParseObject` that returns a single object of entries with a mapper function determinig how to merge section and key names:
+Like there is `ParseFlatHash` for `ParseFlat`, there is `ParseFlatObject` for `ParseObject` that returns a single object of entries with a mapper function determinig how to merge section and key names:
 
     const string ini = @"
         ; last modified 1 April 2001 by John Doe
