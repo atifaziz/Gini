@@ -1,10 +1,14 @@
 # Gini
 
-Gini is an [INI file format](http://en.wikipedia.org/wiki/INI_file) parser written in C#. It is a distributed as a [NuGet package](http://www.nuget.org/packages/Gini.Source/) that adds a single C# source file to a C# project.
+Gini is an [INI file format][1] parser written in C#. It is a distributed as a
+[NuGet package][2] that adds a single C# source file to a C# project.
 
 ## Usage
 
-The most basic method in Gini is called `Parse` that parses the INI file format and yields [groups](http://msdn.microsoft.com/en-us/library/vstudio/bb344977.aspx) of [key-value pairs](http://msdn.microsoft.com/en-us/library/5tbh8a42.aspx). So sections in an INI file format become groups where the group key is the section name and the entries of the section become key-value pairs of the group.
+The most basic method in Gini is called `Parse` that parses the INI file
+format and yields [groups][3] of [key-value pairs][4]. So sections in an INI
+file format become groups where the group key is the section name and the
+entries of the section become key-value pairs of the group.
 
 The following code C# example:
 
@@ -13,10 +17,10 @@ The following code C# example:
         [owner]
         name=John Doe
         organization=Acme Widgets Inc.
-    
+
         [database]
         ; use IP address in case network name resolution is not working
-        server=192.0.2.62     
+        server=192.0.2.62
         port=143
         file=payroll.dat";
 
@@ -37,17 +41,18 @@ produces the output:
     port=143
     file=payroll.dat
 
-The `ParseHash` method parses the INI file format and return a dictionary of sections where each section is itself a dictionary of entries:
+The `ParseHash` method parses the INI file format and return a dictionary of
+sections where each section is itself a dictionary of entries:
 
     const string ini = @"
         ; last modified 1 April 2001 by John Doe
         [owner]
         name=John Doe
         organization=Acme Widgets Inc.
-    
+
         [database]
         ; use IP address in case network name resolution is not working
-        server=192.0.2.62     
+        server=192.0.2.62
         port=143
         file=payroll.dat";
 
@@ -68,17 +73,19 @@ The output produced by the preceding code is:
     Database Port = 143
     Database File = payroll.dat
 
-The `ParseHashFlat` method is like `ParseFlat` except it returns a single dictionary of entries. The section names are merged with the key names via a mapper function to generate unique entires:
+The `ParseHashFlat` method is like `ParseFlat` except it returns a single
+dictionary of entries. The section names are merged with the key names via a
+mapper function to generate unique entires:
 
     const string ini = @"
         ; last modified 1 April 2001 by John Doe
         [owner]
         name=John Doe
         organization=Acme Widgets Inc.
-    
+
         [database]
         ; use IP address in case network name resolution is not working
-        server=192.0.2.62     
+        server=192.0.2.62
         port=143
         file=payroll.dat";
 
@@ -93,17 +100,19 @@ The output is as follows:
     database.port = 143
     database.file = payroll.dat
 
-If Gini is compiled with the `GINI_DYNAMIC` conditional compilation symbol defined then it adds the `ParseObject` method that parses the INI file format into a dynamic object:
+If Gini is compiled with the `GINI_DYNAMIC` conditional compilation symbol
+defined then it adds the `ParseObject` method that parses the INI file format
+into a dynamic object:
 
     const string ini = @"
         ; last modified 1 April 2001 by John Doe
         [owner]
         name=John Doe
         organization=Acme Widgets Inc.
-    
+
         [database]
         ; use IP address in case network name resolution is not working
-        server=192.0.2.62     
+        server=192.0.2.62
         port=143
         file=payroll.dat";
 
@@ -133,10 +142,10 @@ Like there is `ParseFlatHash` for `ParseFlat`, there is `ParseFlatObject` for `P
         [owner]
         name=John Doe
         organization=Acme Widgets Inc.
-    
+
         [database]
         ; use IP address in case network name resolution is not working
-        server=192.0.2.62     
+        server=192.0.2.62
         port=143
         file=payroll.dat";
 
@@ -155,4 +164,10 @@ The output is again:
     Database Port = 143
     Database File = payroll.dat
 
-Syntax errors in the INI file format are silently ignored. Only bits that can be successfully parsed are returned or processed.
+Syntax errors in the INI file format are silently ignored. Only bits that can
+be successfully parsed are returned or processed.
+
+  [1]: http://en.wikipedia.org/wiki/INI_file
+  [2]: http://www.nuget.org/packages/Gini.Source/
+  [3]: http://msdn.microsoft.com/en-us/library/vstudio/bb344977.aspx
+  [4]: http://msdn.microsoft.com/en-us/library/5tbh8a42.aspx
