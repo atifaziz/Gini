@@ -67,15 +67,11 @@ namespace Gini
             }
         }
 
-        public static IEnumerable<IGrouping<string, KeyValuePair<string, string>>> Parse(string ini)
-        {
-            return Parse(ini, KeyValuePair.Create);
-        }
+        public static IEnumerable<IGrouping<string, KeyValuePair<string, string>>> Parse(string ini) =>
+            Parse(ini, KeyValuePair.Create);
 
-        public static IEnumerable<IGrouping<string, T>> Parse<T>(string ini, Func<string, string, T> settingSelector)
-        {
-            return Parse(ini, (_, k, v) => settingSelector(k, v));
-        }
+        public static IEnumerable<IGrouping<string, T>> Parse<T>(string ini, Func<string, string, T> settingSelector) =>
+            Parse(ini, (_, k, v) => settingSelector(k, v));
 
         public static IEnumerable<IGrouping<string, T>> Parse<T>(string ini, Func<string, string, string, T> settingSelector)
         {
@@ -107,10 +103,8 @@ namespace Gini
             return entries.GroupAdjacent(e => e.Key, e => e.Value);
         }
 
-        public static IDictionary<string, IDictionary<string, string>> ParseHash(string ini)
-        {
-            return ParseHash(ini, null);
-        }
+        public static IDictionary<string, IDictionary<string, string>> ParseHash(string ini) =>
+            ParseHash(ini, null);
 
         public static IDictionary<string, IDictionary<string, string>> ParseHash(string ini, IEqualityComparer<string> comparer)
         {
@@ -124,10 +118,8 @@ namespace Gini
                                          comparer);
         }
 
-        public static IDictionary<string, string> ParseFlatHash(string ini, Func<string, string, string> keyMerger)
-        {
-            return ParseFlatHash(ini, keyMerger, null);
-        }
+        public static IDictionary<string, string> ParseFlatHash(string ini, Func<string, string, string> keyMerger) =>
+            ParseFlatHash(ini, keyMerger, null);
 
         public static IDictionary<string, string> ParseFlatHash(string ini, Func<string, string, string> keyMerger, IEqualityComparer<string> comparer)
         {
@@ -145,10 +137,8 @@ namespace Gini
 
         static class KeyValuePair
         {
-            public static KeyValuePair<TKey, TValue> Create<TKey, TValue>(TKey key, TValue value)
-            {
-                return new KeyValuePair<TKey, TValue>(key, value);
-            }
+            public static KeyValuePair<TKey, TValue> Create<TKey, TValue>(TKey key, TValue value) =>
+                new KeyValuePair<TKey, TValue>(key, value);
         }
 
         #region MoreLINQ
@@ -285,7 +275,7 @@ namespace Gini
                 _members = members;
             }
 
-            public TKey Key { get; private set; }
+            public TKey Key { get; }
 
             public IEnumerator<TElement> GetEnumerator() { return _members.GetEnumerator(); }
             IEnumerator IEnumerable.GetEnumerator() { return GetEnumerator(); }

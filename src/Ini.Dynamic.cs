@@ -36,10 +36,8 @@ namespace Gini
 
     partial class Ini
     {
-        public static dynamic ParseObject(string ini)
-        {
-            return ParseObject(ini, null);
-        }
+        public static dynamic ParseObject(string ini) =>
+            ParseObject(ini, null);
 
         public static dynamic ParseObject(string ini, IEqualityComparer<string> comparer)
         {
@@ -56,10 +54,8 @@ namespace Gini
             return new Config<Config<string>>(config);
         }
 
-        public static dynamic ParseFlatObject(string ini, Func<string, string, string> keyMerger)
-        {
-            return ParseFlatObject(ini, keyMerger, null);
-        }
+        public static dynamic ParseFlatObject(string ini, Func<string, string, string> keyMerger) =>
+            ParseFlatObject(ini, keyMerger, null);
 
         public static dynamic ParseFlatObject(string ini, Func<string, string, string> keyMerger, IEqualityComparer<string> comparer)
         {
@@ -93,11 +89,8 @@ namespace Gini
                 return true;
             }
 
-            object Find(string name)
-            {
-                T value;
-                return _entries.TryGetValue(name, out value) ? value : default(T);
-            }
+            object Find(string name) =>
+                _entries.TryGetValue(name, out var value) ? value : default;
         }
     }
 }
