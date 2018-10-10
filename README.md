@@ -12,24 +12,26 @@ entries of the section become key-value pairs of the group.
 
 The following code C# example:
 
-    const string ini = @"
-        ; last modified 1 April 2001 by John Doe
-        [owner]
-        name=John Doe
-        organization=Acme Widgets Inc.
+```c#
+const string ini = @"
+    ; last modified 1 April 2001 by John Doe
+    [owner]
+    name=John Doe
+    organization=Acme Widgets Inc.
 
-        [database]
-        ; use IP address in case network name resolution is not working
-        server=192.0.2.62
-        port=143
-        file=payroll.dat";
+    [database]
+    ; use IP address in case network name resolution is not working
+    server=192.0.2.62
+    port=143
+    file=payroll.dat";
 
-    foreach (var g in Ini.Parse(ini))
-    {
-        Console.WriteLine("[{0}]", g.Key);
-        foreach (var e in g)
-            Console.WriteLine("{0}={1}", e.Key, e.Value);
-    }
+foreach (var g in Ini.Parse(ini))
+{
+    Console.WriteLine("[{0}]", g.Key);
+    foreach (var e in g)
+        Console.WriteLine("{0}={1}", e.Key, e.Value);
+}
+```
 
 produces the output:
 
@@ -44,26 +46,28 @@ produces the output:
 The `ParseHash` method parses the INI file format and return a dictionary of
 sections where each section is itself a dictionary of entries:
 
-    const string ini = @"
-        ; last modified 1 April 2001 by John Doe
-        [owner]
-        name=John Doe
-        organization=Acme Widgets Inc.
+```c#
+const string ini = @"
+    ; last modified 1 April 2001 by John Doe
+    [owner]
+    name=John Doe
+    organization=Acme Widgets Inc.
 
-        [database]
-        ; use IP address in case network name resolution is not working
-        server=192.0.2.62
-        port=143
-        file=payroll.dat";
+    [database]
+    ; use IP address in case network name resolution is not working
+    server=192.0.2.62
+    port=143
+    file=payroll.dat";
 
-    var config = Ini.ParseHash(ini);
-    var owner = config["owner"];
-    Console.WriteLine("Owner Name = {0}", owner["name"]);
-    Console.WriteLine("Owner Organization = {0}", owner["organization"]);
-    var database = config["database"];
-    Console.WriteLine("Database Server = {0}", database["server"]);
-    Console.WriteLine("Database Port = {0}", database["port"]);
-    Console.WriteLine("Database File = {0}", database["file"]);
+var config = Ini.ParseHash(ini);
+var owner = config["owner"];
+Console.WriteLine("Owner Name = {0}", owner["name"]);
+Console.WriteLine("Owner Organization = {0}", owner["organization"]);
+var database = config["database"];
+Console.WriteLine("Database Server = {0}", database["server"]);
+Console.WriteLine("Database Port = {0}", database["port"]);
+Console.WriteLine("Database File = {0}", database["file"]);
+```
 
 The output produced by the preceding code is:
 
@@ -77,20 +81,22 @@ The `ParseHashFlat` method is like `ParseFlat` except it returns a single
 dictionary of entries. The section names are merged with the key names via a
 mapper function to generate unique entires:
 
-    const string ini = @"
-        ; last modified 1 April 2001 by John Doe
-        [owner]
-        name=John Doe
-        organization=Acme Widgets Inc.
+```c#
+const string ini = @"
+    ; last modified 1 April 2001 by John Doe
+    [owner]
+    name=John Doe
+    organization=Acme Widgets Inc.
 
-        [database]
-        ; use IP address in case network name resolution is not working
-        server=192.0.2.62
-        port=143
-        file=payroll.dat";
+    [database]
+    ; use IP address in case network name resolution is not working
+    server=192.0.2.62
+    port=143
+    file=payroll.dat";
 
-    foreach (var e in Ini.ParseFlatHash(ini, (s, k) => s + "." + k))
-        Console.WriteLine("{0} = {1}", e.Key, e.Value);
+foreach (var e in Ini.ParseFlatHash(ini, (s, k) => s + "." + k))
+    Console.WriteLine("{0} = {1}", e.Key, e.Value);
+```
 
 The output is as follows:
 
@@ -103,6 +109,7 @@ The output is as follows:
 Gini can also parse the INI file format into a dynamic object via the
 `ParseObject`:
 
+```c#
     const string ini = @"
         ; last modified 1 April 2001 by John Doe
         [owner]
@@ -123,6 +130,7 @@ Gini can also parse the INI file format into a dynamic object via the
     Console.WriteLine("Database Server = {0}", database.Server);
     Console.WriteLine("Database Port = {0}", database.Port);
     Console.WriteLine("Database File = {0}", database.File);
+```
 
 The output is:
 
@@ -136,24 +144,26 @@ Note that the lookup of properties on the dynamic object is case-insensitive.
 
 Like there is `ParseFlatHash` for `ParseFlat`, there is `ParseFlatObject` for `ParseObject` that returns a single object of entries with a mapper function determinig how to merge section and key names:
 
-    const string ini = @"
-        ; last modified 1 April 2001 by John Doe
-        [owner]
-        name=John Doe
-        organization=Acme Widgets Inc.
+```c#
+const string ini = @"
+    ; last modified 1 April 2001 by John Doe
+    [owner]
+    name=John Doe
+    organization=Acme Widgets Inc.
 
-        [database]
-        ; use IP address in case network name resolution is not working
-        server=192.0.2.62
-        port=143
-        file=payroll.dat";
+    [database]
+    ; use IP address in case network name resolution is not working
+    server=192.0.2.62
+    port=143
+    file=payroll.dat";
 
-    var config = Ini.ParseFlatObject(ini, (s, k) => s + k);
-    Console.WriteLine("Owner Name = {0}", config.OwnerName);
-    Console.WriteLine("Owner Organization = {0}", config.OwnerOrganization);
-    Console.WriteLine("Database Server = {0}", config.DatabaseServer);
-    Console.WriteLine("Database Port = {0}", config.DatabasePort);
-    Console.WriteLine("Database File = {0}", config.DatabaseFile);
+var config = Ini.ParseFlatObject(ini, (s, k) => s + k);
+Console.WriteLine("Owner Name = {0}", config.OwnerName);
+Console.WriteLine("Owner Organization = {0}", config.OwnerOrganization);
+Console.WriteLine("Database Server = {0}", config.DatabaseServer);
+Console.WriteLine("Database Port = {0}", config.DatabasePort);
+Console.WriteLine("Database File = {0}", config.DatabaseFile);
+```
 
 The output is again:
 
