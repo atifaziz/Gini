@@ -1,15 +1,17 @@
 @echo off
-setlocal
-chcp 1252 > nul
-for %%i in (NuGet.exe) do set nuget=%%~dpnx$PATH:i
-if "%nuget%"=="" goto :nonuget
-cd "%~dp0"
-call build /v:m ^
- && NuGet pack Gini.Source.nuspec ^
- && NuGet pack Gini.nuspec -Symbols
+pushd "%~dp0"
+call :main %*
+popd
 goto :EOF
 
-:nonuget
-echo NuGet executable not found in PATH
-echo For more on NuGet, see http://nuget.codeplex.com
-exit /b 2
+:main
+setlocal
+set VERSION_SUFFIX=
+if not "%~1"=="" set VERSION_SUFFIX=--version-suffix %~1
+call build                                               ^
+ && dotnet pack                                          ^
+           --no-build --include-symbols --include-source ^
+           -c Release -o ..\dist                         ^
+           %VERSION_SUFFIX%                              ^
+           src
+goto :EOF

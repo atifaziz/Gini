@@ -14,6 +14,6 @@
         <tags>ini</tags>
     </metadata>
     <files>
-        <file src="Ini.cs" target="content\App_Packages\Gini\Ini.cs" />
+        <file src="src\Ini.cs" target="content\App_Packages\Gini\Ini.cs" />
     </files>
 </package>

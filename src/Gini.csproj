@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.0</TargetFramework>
+    <DefineConstants>$(DefineConstants);TRACE;GINI_PUBLIC;GINI_DYNAMIC</DefineConstants>
+    <VersionPrefix>1.1.0</VersionPrefix>
+    <Copyright>Copyright © 2013 Atif Aziz. All rights reserved.</Copyright>
+    <Description>INI file format parser.</Description>
+    <Authors>Atif Aziz</Authors>
+    <Owners>Atif Aziz</Owners>
+    <PackageProjectUrl>https://github.com/atifaziz/Gini</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/atifaziz/Gini.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>ini</PackageTags>
+    <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>..\bin\Debug\</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>..\bin\Release\</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="..\COPYING.txt" Link="COPYING.txt">
+      <PackagePath />
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Dynamic.Runtime" Version="4.3.0" />
+  </ItemGroup>
+
+</Project>
