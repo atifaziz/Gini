@@ -79,7 +79,7 @@ namespace Gini
 
         public static IEnumerable<IGrouping<string, T>> Parse<T>(string ini, Func<string, string, string, T> settingSelector)
         {
-            if (settingSelector == null) throw new ArgumentNullException("settingSelector");
+            if (settingSelector == null) throw new ArgumentNullException(nameof(settingSelector));
 
             ini = ini.Trim();
             if (string.IsNullOrEmpty(ini))
@@ -131,7 +131,7 @@ namespace Gini
 
         public static IDictionary<string, string> ParseFlatHash(string ini, Func<string, string, string> keyMerger, IEqualityComparer<string> comparer)
         {
-            if (keyMerger == null) throw new ArgumentNullException("keyMerger");
+            if (keyMerger == null) throw new ArgumentNullException(nameof(keyMerger));
 
             var settings = new Dictionary<string, string>(comparer ?? StringComparer.OrdinalIgnoreCase);
             foreach (var setting in from section in Parse(ini)

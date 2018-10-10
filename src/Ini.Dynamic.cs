@@ -63,7 +63,7 @@ namespace Gini
 
         public static dynamic ParseFlatObject(string ini, Func<string, string, string> keyMerger, IEqualityComparer<string> comparer)
         {
-            if (keyMerger == null) throw new ArgumentNullException("keyMerger");
+            if (keyMerger == null) throw new ArgumentNullException(nameof(keyMerger));
             return new Config<string>(ParseFlatHash(ini, keyMerger, comparer));
         }
 
@@ -79,14 +79,14 @@ namespace Gini
 
             public override bool TryGetMember(GetMemberBinder binder, out object result)
             {
-                if (binder == null) throw new ArgumentNullException("binder");
+                if (binder == null) throw new ArgumentNullException(nameof(binder));
                 result = Find(binder.Name);
                 return true;
             }
 
             public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object result)
             {
-                if (indexes == null) throw new ArgumentNullException("indexes");
+                if (indexes == null) throw new ArgumentNullException(nameof(indexes));
                 if (indexes.Length != 1) throw new ArgumentException("Too many indexes supplied.");
                 var index = indexes[0];
                 result = Find(index == null ? null : Convert.ToString(index, CultureInfo.InvariantCulture));
