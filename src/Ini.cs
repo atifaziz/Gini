@@ -154,7 +154,7 @@ namespace Gini
         #region MoreLINQ
 
         // MoreLINQ - Extensions to LINQ to Objects
-        // Copyright (c) 2008 Jonathan Skeet. All rights reserved.
+        // Copyright (c) 2012 Atif Aziz. All rights reserved.
         //
         // Licensed under the Apache License, Version 2.0 (the "License");
         // you may not use this file except in compliance with the License.
@@ -168,28 +168,24 @@ namespace Gini
         // See the License for the specific language governing permissions and
         // limitations under the License.
 
-        static IEnumerable<TResult> Pairwise<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, TSource, TResult> resultSelector)
+        public static IEnumerable<TResult> Pairwise<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, TSource, TResult> resultSelector)
         {
-            if (source == null) throw new ArgumentNullException("source");
-            if (resultSelector == null) throw new ArgumentNullException("resultSelector");
-            return PairwiseImpl(source, resultSelector);
-        }
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            if (resultSelector == null) throw new ArgumentNullException(nameof(resultSelector));
 
-        static IEnumerable<TResult> PairwiseImpl<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, TSource, TResult> resultSelector)
-        {
-            Debug.Assert(source != null);
-            Debug.Assert(resultSelector != null);
-
-            using (var e = source.GetEnumerator())
+            return _(); IEnumerable<TResult> _()
             {
-                if (!e.MoveNext())
-                    yield break;
-
-                var previous = e.Current;
-                while (e.MoveNext())
+                using (var e = source.GetEnumerator())
                 {
-                    yield return resultSelector(previous, e.Current);
-                    previous = e.Current;
+                    if (!e.MoveNext())
+                        yield break;
+
+                    var previous = e.Current;
+                    while (e.MoveNext())
+                    {
+                        yield return resultSelector(previous, e.Current);
+                        previous = e.Current;
+                    }
                 }
             }
         }
@@ -198,7 +194,6 @@ namespace Gini
             this IEnumerable<TSource> source,
             Func<TSource, TKey> keySelector)
         {
-            // ReSharper disable once IntroduceOptionalParameters.Local
             return GroupAdjacent(source, keySelector, null);
         }
 
@@ -207,8 +202,8 @@ namespace Gini
             Func<TSource, TKey> keySelector,
             IEqualityComparer<TKey> comparer)
         {
-            if (source == null) throw new ArgumentNullException("source");
-            if (keySelector == null) throw new ArgumentNullException("keySelector");
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            if (keySelector == null) throw new ArgumentNullException(nameof(keySelector));
 
             return GroupAdjacent(source, keySelector, e => e, comparer);
         }
@@ -218,7 +213,6 @@ namespace Gini
             Func<TSource, TKey> keySelector,
             Func<TSource, TElement> elementSelector)
         {
-            // ReSharper disable once IntroduceOptionalParameters.Local
             return GroupAdjacent(source, keySelector, elementSelector, null);
         }
 
@@ -228,9 +222,9 @@ namespace Gini
             Func<TSource, TElement> elementSelector,
             IEqualityComparer<TKey> comparer)
         {
-            if (source == null) throw new ArgumentNullException("source");
-            if (keySelector == null) throw new ArgumentNullException("keySelector");
-            if (elementSelector == null) throw new ArgumentNullException("elementSelector");
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            if (keySelector == null) throw new ArgumentNullException(nameof(keySelector));
+            if (elementSelector == null) throw new ArgumentNullException(nameof(elementSelector));
 
             return GroupAdjacentImpl(source, keySelector, elementSelector,
                                      comparer ?? EqualityComparer<TKey>.Default);
@@ -247,25 +241,25 @@ namespace Gini
             Debug.Assert(elementSelector != null);
             Debug.Assert(comparer != null);
 
-            using (var iterator = source.Select(item => KeyValuePair.Create(keySelector(item), elementSelector(item)))
-                                        .GetEnumerator())
+            using (var iterator = source.GetEnumerator())
             {
                 var group = default(TKey);
                 var members = (List<TElement>) null;
 
                 while (iterator.MoveNext())
                 {
-                    var item = iterator.Current;
-                    if (members != null && comparer.Equals(group, item.Key))
+                    var key = keySelector(iterator.Current);
+                    var element = elementSelector(iterator.Current);
+                    if (members != null && comparer.Equals(group, key))
                     {
-                        members.Add(item.Value);
+                        members.Add(element);
                     }
                     else
                     {
                         if (members != null)
                             yield return CreateGroupAdjacentGrouping(group, members);
-                        group = item.Key;
-                        members = new List<TElement> { item.Value };
+                        group = key;
+                        members = new List<TElement> { element };
                     }
                 }
 
