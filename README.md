@@ -142,7 +142,9 @@ The output is:
 
 Note that the lookup of properties on the dynamic object is case-insensitive.
 
-Like there is `ParseFlatHash` for `ParseFlat`, there is `ParseFlatObject` for `ParseObject` that returns a single object of entries with a mapper function determinig how to merge section and key names:
+Like there is `ParseFlatHash` for `ParseFlat`, there is `ParseFlatObject` for
+`ParseObject` that returns a single object of entries with a mapper function
+determinig how to merge section and key names:
 
 ```c#
 const string ini = @"
