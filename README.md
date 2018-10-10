@@ -1,7 +1,7 @@
 # Gini
 
 Gini is an [INI file format][1] parser written in C#. It is a distributed as a
-[NuGet package][2] that adds a single C# source file to a C# project.
+[NuGet package][2].
 
 ## Usage
 
@@ -100,9 +100,8 @@ The output is as follows:
     database.port = 143
     database.file = payroll.dat
 
-If Gini is compiled with the `GINI_DYNAMIC` conditional compilation symbol
-defined then it adds the `ParseObject` method that parses the INI file format
-into a dynamic object:
+Gini can also parse the INI file format into a dynamic object via the
+`ParseObject`:
 
     const string ini = @"
         ; last modified 1 April 2001 by John Doe
@@ -168,6 +167,6 @@ Syntax errors in the INI file format are silently ignored. Only bits that can
 be successfully parsed are returned or processed.
 
   [1]: http://en.wikipedia.org/wiki/INI_file
-  [2]: http://www.nuget.org/packages/Gini.Source/
+  [2]: http://www.nuget.org/packages/Gini/
   [3]: http://msdn.microsoft.com/en-us/library/vstudio/bb344977.aspx
   [4]: http://msdn.microsoft.com/en-us/library/5tbh8a42.aspx

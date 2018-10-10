@@ -35,10 +35,6 @@ namespace Gini
 
     #endregion
 
-    #if GINI_PUBLIC
-    public partial class Ini { }
-    #endif
-
     static partial class Ini
     {
         static class Parser
@@ -304,88 +300,3 @@ namespace Gini
         #endregion
     }
 }
-
-#if GINI_DYNAMIC
-
-namespace Gini
-{
-    #region Imports
-
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Dynamic;
-    using System.Globalization;
-    using System.Linq;
-
-    #endregion
-
-    static partial class Ini
-    {
-        public static dynamic ParseObject(string ini)
-        {
-            return ParseObject(ini, null);
-        }
-
-        public static dynamic ParseObject(string ini, IEqualityComparer<string> comparer)
-        {
-            comparer = comparer ?? StringComparer.OrdinalIgnoreCase;
-            var config = new Dictionary<string, Config<string>>(comparer);
-            foreach (var section in from g in Parse(ini).GroupBy(e => e.Key ?? string.Empty, comparer)
-                                    select KeyValuePair.Create(g.Key, g.SelectMany(e => e)))
-            {
-                var settings = new Dictionary<string, string>(comparer);
-                foreach (var setting in section.Value)
-                    settings[setting.Key] = setting.Value;
-                config[section.Key] = new Config<string>(settings);
-            }
-            return new Config<Config<string>>(config);
-        }
-
-        public static dynamic ParseFlatObject(string ini, Func<string, string, string> keyMerger)
-        {
-            return ParseFlatObject(ini, keyMerger, null);
-        }
-
-        public static dynamic ParseFlatObject(string ini, Func<string, string, string> keyMerger, IEqualityComparer<string> comparer)
-        {
-            if (keyMerger == null) throw new ArgumentNullException("keyMerger");
-            return new Config<string>(ParseFlatHash(ini, keyMerger, comparer));
-        }
-
-        sealed class Config<T> : DynamicObject
-        {
-            readonly IDictionary<string, T> _entries;
-
-            public Config(IDictionary<string, T> entries)
-            {
-                Debug.Assert(entries != null);
-                _entries = entries;
-            }
-
-            public override bool TryGetMember(GetMemberBinder binder, out object result)
-            {
-                if (binder == null) throw new ArgumentNullException("binder");
-                result = Find(binder.Name);
-                return true;
-            }
-
-            public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object result)
-            {
-                if (indexes == null) throw new ArgumentNullException("indexes");
-                if (indexes.Length != 1) throw new ArgumentException("Too many indexes supplied.");
-                var index = indexes[0];
-                result = Find(index == null ? null : Convert.ToString(index, CultureInfo.InvariantCulture));
-                return true;
-            }
-
-            object Find(string name)
-            {
-                T value;
-                return _entries.TryGetValue(name, out value) ? value : default(T);
-            }
-        }
-    }
-}
-
-#endif

@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.0</TargetFramework>
-    <DefineConstants>$(DefineConstants);TRACE;GINI_PUBLIC;GINI_DYNAMIC</DefineConstants>
     <VersionPrefix>1.1.0</VersionPrefix>
     <Copyright>Copyright © 2013 Atif Aziz. All rights reserved.</Copyright>
     <Description>INI file format parser.</Description>
