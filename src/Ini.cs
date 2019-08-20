@@ -156,7 +156,7 @@ namespace Gini
         // See the License for the specific language governing permissions and
         // limitations under the License.
 
-        public static IEnumerable<TResult> Pairwise<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, TSource, TResult> resultSelector)
+        static IEnumerable<TResult> Pairwise<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, TSource, TResult> resultSelector)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
             if (resultSelector == null) throw new ArgumentNullException(nameof(resultSelector));
