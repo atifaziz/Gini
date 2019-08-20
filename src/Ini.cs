@@ -31,7 +31,6 @@ namespace Gini
     using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Linq;
-    using System.Text.RegularExpressions;
 
     #endregion
 
@@ -39,31 +38,374 @@ namespace Gini
     {
         static class Parser
         {
-            static readonly Regex Regex;
-            static readonly int SectionNumber;
-            static readonly int KeyNumber;
-            static readonly int ValueNumber;
-
-            static Parser()
+            enum State
             {
-                var re = Regex =
-                    new Regex(@"^ *(\[(?<s>[a-z0-9-._][a-z0-9-._ ]*)\]|(?<k>[a-z0-9-._][a-z0-9-._ ]*)= *(?<v>[^\r\n]*))\s*$",
-                        RegexOptions.Multiline
-                        | RegexOptions.IgnoreCase
-                        | RegexOptions.CultureInvariant);
-                SectionNumber = re.GroupNumberFromName("s");
-                KeyNumber = re.GroupNumberFromName("k");
-                ValueNumber = re.GroupNumberFromName("v");
+                NewLine,
+                Cr,
+                Comment,
+                ScanSectionName,
+                SectionName,
+                ScanSectionClose,
+                SectionClosure,
+                Key,
+                ScanEqual,
+                ScanValue,
+                Value,
+                ValueWhiteSpace,
+            }
+
+            static bool IsNamePunctuation(char ch) =>
+                ch == '.' || ch == '-' || ch == '_';
+
+            static bool IsNameStart(char ch) =>
+                char.IsLetter(ch) || IsNamePunctuation(ch);
+
+            static bool IsNameMid(char ch) =>
+                char.IsLetterOrDigit(ch) || IsNamePunctuation(ch);
+
+            static bool IsNameEnd(char ch) =>
+                char.IsLetterOrDigit(ch);
+
+            static class Expectation
+            {
+                public const string Equal               = "Expected '='.";
+                public const string RightBracket        = "Expected ']'.";
+                public const string SectionName         = "Expected section name.";
+                public const string SectionKeyOrComment = "Expected section, key or comment.";
+                public const string CommentOrWhiteSpace = "Expected comment or white space.";
+                public const string NonPunctuation      = "Expected non-punctuation.";
             }
 
             // ReSharper disable once MemberHidesStaticFromOuterClass
-            public static IEnumerable<T> Parse<T>(string ini, Func<string, string, string, T> selector) =>
-                from Match m in Regex.Matches(ini ?? string.Empty)
-                select m.Groups into g
-                select selector(g[SectionNumber].Value.TrimEnd(),
-                                g[KeyNumber].Value.TrimEnd(),
-                                g[ValueNumber].Value.TrimEnd());
+
+            public static IEnumerable<T> Parse<T>(string ini, Func<string, string, string, T> selector)
+            {
+                var state = State.NewLine;
+                var line = 1;
+                var col = 1;
+                var si = 0;
+                var vtsi = -1; // value tail space index
+                var section = (string)null;
+                var key = (string)null;
+
+                string Text(int end) =>
+                    end == si ? null : ini.Substring(si, end - si);
+
+                var i = 0;
+
+                bool IsDuplicatePunctuation(char ch)
+                {
+                    Debug.Assert(i > si);
+                    return ch == ini[i - 1] && IsNamePunctuation(ch);
+                }
+
+                for (; i < ini.Length; i++)
+                {
+                    var ch = ini[i];
+                    restart:
+                    switch (state)
+                    {
+                        case State.NewLine:
+                        {
+                            switch (ch)
+                            {
+                                case ' ':
+                                case '\t':
+                                    break;
+                                case '[':
+                                    state = State.ScanSectionName; break;
+                                case '#':
+                                case ';':
+                                    state = State.Comment;
+                                    break;
+                                case '\n':
+                                    line++; col = 0;
+                                    break;
+                                case '\r':
+                                    state = State.Cr;
+                                    break;
+                                case char c when IsNameStart(c):
+                                    si = i;
+                                    state = State.Key;
+                                    break;
+                                case '=':
+                                    key = null;
+                                    state = State.ScanValue;
+                                    break;
+                                default:
+                                    throw SyntaxError(Expectation.SectionKeyOrComment);
+                            }
+                            break;
+                        }
+                        case State.Cr:
+                        {
+                            switch (ch)
+                            {
+                                case '\r':
+                                    line++; col = 0;
+                                    break;
+                                case '\n':
+                                    state = State.NewLine;
+                                    goto restart;
+                                default:
+                                    line++; col = 1;
+                                    state = State.NewLine;
+                                    goto restart;
+                            }
+                            break;
+                        }
+                        case State.Comment:
+                        {
+                            switch (ch)
+                            {
+                                case '\r':
+                                    state = State.Cr;
+                                    break;
+                                case '\n':
+                                    state = State.NewLine;
+                                    goto restart;
+                            }
+                            break;
+                        }
+                        case State.ScanSectionName:
+                        {
+                            switch (ch)
+                            {
+                                case ' ':
+                                case '\t':
+                                    break;
+                                case ']':
+                                    section = null;
+                                    state = State.SectionClosure;
+                                    break;
+                                case char c when IsNameStart(c):
+                                    si = i;
+                                    state = State.SectionName;
+                                    break;
+                                default:
+                                    throw SyntaxError(Expectation.SectionName);
+                            }
+                            break;
+                        }
+                        case State.SectionName:
+                        {
+                            switch (ch)
+                            {
+                                case '\t':
+                                case ' ':
+                                case ']':
+                                    if (!IsNameEnd(ini[i - 1]))
+                                        throw SyntaxError(Expectation.RightBracket, offset: -1);
+                                    section = Text(i);
+                                    state = State.ScanSectionClose;
+                                    goto restart;
+                                case char c when IsNameMid(c):
+                                    if (IsDuplicatePunctuation(c))
+                                        throw SyntaxError(Expectation.NonPunctuation);
+                                    break;
+                                default:
+                                    throw SyntaxError(Expectation.RightBracket);
+                            }
+                            break;
+                        }
+                        case State.ScanSectionClose:
+                        {
+                            switch (ch)
+                            {
+                                case ' ':
+                                case '\t':
+                                    break;
+                                case ']':
+                                    state = State.SectionClosure;
+                                    break;
+                                default:
+                                    throw SyntaxError(Expectation.RightBracket);
+                            }
+                            break;
+                        }
+                        case State.SectionClosure:
+                        {
+                            switch (ch)
+                            {
+                                case ' ':
+                                case '\t':
+                                    break;
+                                case '\r':
+                                    state = State.Cr;
+                                    break;
+                                case '\n':
+                                    state = State.NewLine;
+                                    goto restart;
+                                case '#':
+                                case ';':
+                                    state = State.Comment;
+                                    break;
+                                default:
+                                    throw SyntaxError(Expectation.CommentOrWhiteSpace);
+                            }
+                            break;
+                        }
+                        case State.Key:
+                        {
+                            switch (ch)
+                            {
+                                case '\t':
+                                case ' ':
+                                case '=':
+                                    if (!IsNameEnd(ini[i - 1]))
+                                        throw SyntaxError(Expectation.Equal, offset: -1);
+                                    key = Text(i);
+                                    state = State.ScanEqual;
+                                    goto restart;
+                                case char c when IsNameMid(c):
+                                    if (IsDuplicatePunctuation(c))
+                                        throw SyntaxError(Expectation.NonPunctuation);
+                                    break;
+                                default:
+                                    throw SyntaxError(Expectation.Equal);
+                            }
+                            break;
+                        }
+                        case State.ScanEqual:
+                        {
+                            switch (ch)
+                            {
+                                case ' ':
+                                case '\t':
+                                    break;
+                                case '=':
+                                    state = State.ScanValue;
+                                    break;
+                                default:
+                                    throw SyntaxError(Expectation.Equal);
+                            }
+                            break;
+                        }
+                        case State.ScanValue:
+                        {
+                            switch (ch)
+                            {
+                                case ' ':
+                                case '\t':
+                                    break;
+                                default:
+                                    si = i;
+                                    state = State.Value;
+                                    if (ch == '\r' || ch == '\n')
+                                        goto restart;
+                                    break;
+                            }
+                            break;
+                        }
+                        case State.Value:
+                        {
+                            switch (ch)
+                            {
+                                case ' ':
+                                case '\t':
+                                    vtsi = i;
+                                    state = State.ValueWhiteSpace;
+                                    break;
+                                case '\r':
+                                {
+                                    if (Token(Text(i), out var t))
+                                        yield return t;
+                                    state = State.Cr;
+                                    break;
+                                }
+                                case '\n':
+                                {
+                                    if (Token(Text(i), out var t))
+                                        yield return t;
+                                    state = State.NewLine;
+                                    goto restart;
+                                }
+                            }
+                            break;
+                        }
+                        case State.ValueWhiteSpace:
+                        {
+                            switch (ch)
+                            {
+                                case ' ':
+                                case '\t':
+                                    break;
+                                case '\r':
+                                case '\n':
+                                    if (Token(Text(vtsi), out var t))
+                                        yield return t;
+                                    state = State.NewLine;
+                                    goto restart;
+                                default:
+                                    vtsi = -1;
+                                    state = State.Value;
+                                    break;
+                            }
+                            break;
+                        }
+                    }
+
+                    col++;
+                }
+
+                switch (state)
+                {
+                    case State.ScanSectionName:
+                        throw SyntaxError(Expectation.SectionName);
+                    case State.SectionName:
+                        throw SyntaxError(Expectation.RightBracket, offset: IsNameEnd(ini[i - 1]) ? 0 : -1);
+                    case State.ScanSectionClose:
+                        throw SyntaxError(Expectation.RightBracket);
+                    case State.Key:
+                        throw SyntaxError(Expectation.Equal, offset: IsNameEnd(ini[i - 1]) ? 0 : -1);
+                    case State.ScanEqual:
+                        throw SyntaxError(Expectation.Equal);
+                    case State.ScanValue:
+                    {
+                        if (Token(null, out var t))
+                            yield return t;
+                        break;
+                    }
+                    case State.Value:
+                    {
+                        if (Token(Text(i), out var t))
+                            yield return t;
+                        break;
+                    }
+                    case State.ValueWhiteSpace:
+                    {
+                        if (Token(Text(vtsi), out var t))
+                            yield return t;
+                        break;
+                    }
+                    case State.Comment:
+                    case State.Cr:
+                    case State.NewLine:
+                    case State.SectionClosure:
+                        break;
+                    default:
+                        throw new Exception($"Internal implementation error ({state}).");
+                }
+
+                bool Token(string v, out T token)
+                {
+                    if (key is null && v is null)
+                    {
+                        token = default;
+                        return false;
+                    }
+
+                    token = selector(section, key, v);
+                    return true;
+                }
+
+                Exception SyntaxError(string expectation, int offset = 0) =>
+                    new FormatException($"Syntax error (at {line}:{col + offset}) parsing INI format.{Concat(" ", expectation)}");
+            }
         }
+
+        static string Concat(string s1, string s2)
+            => s1 != null && s2 != null ? s1 + s2 : null;
 
         public static IEnumerable<IGrouping<string, KeyValuePair<string, string>>> Parse(string ini) =>
             Parse(ini, KeyValuePair.Create);
@@ -75,30 +417,11 @@ namespace Gini
         {
             if (settingSelector == null) throw new ArgumentNullException(nameof(settingSelector));
 
-            ini = ini.Trim();
-            if (string.IsNullOrEmpty(ini))
+            if (string.IsNullOrWhiteSpace(ini))
                 return Enumerable.Empty<IGrouping<string, T>>();
 
-            var entries =
-                from ms in new[]
-                {
-                    Parser.Parse(ini, (s, k, v) => new
-                    {
-                        Section = s,
-                        Setting = KeyValuePair.Create(k, v)
-                    })
-                }
-                from p in Enumerable.Repeat(new { Section = (string) null,
-                                                  Setting = KeyValuePair.Create(string.Empty, string.Empty) }, 1)
-                                    .Concat(ms)
-                                    .GroupAdjacent(s => s.Section == null || s.Section.Length > 0)
-                                    .Pairwise((prev, curr) => new { Prev = prev, Curr = curr })
-                where p.Prev.Key
-                select KeyValuePair.Create(p.Prev.Last().Section, p.Curr) into e
-                from s in e.Value
-                select KeyValuePair.Create(e.Key, settingSelector(e.Key, s.Setting.Key, s.Setting.Value));
-
-            return entries.GroupAdjacent(e => e.Key, e => e.Value);
+            return Parser.Parse(ini, (s, k, v) => KeyValuePair.Create(s, settingSelector(s, k, v)))
+                         .GroupAdjacent(e => e.Key, e => e.Value);
         }
 
         public static IDictionary<string, IDictionary<string, string>> ParseHash(string ini) =>
@@ -155,35 +478,6 @@ namespace Gini
         // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
         // See the License for the specific language governing permissions and
         // limitations under the License.
-
-        static IEnumerable<TResult> Pairwise<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, TSource, TResult> resultSelector)
-        {
-            if (source == null) throw new ArgumentNullException(nameof(source));
-            if (resultSelector == null) throw new ArgumentNullException(nameof(resultSelector));
-
-            return _(); IEnumerable<TResult> _()
-            {
-                using (var e = source.GetEnumerator())
-                {
-                    if (!e.MoveNext())
-                        yield break;
-
-                    var previous = e.Current;
-                    while (e.MoveNext())
-                    {
-                        yield return resultSelector(previous, e.Current);
-                        previous = e.Current;
-                    }
-                }
-            }
-        }
-
-        static IEnumerable<IGrouping<TKey, TSource>> GroupAdjacent<TSource, TKey>(
-            this IEnumerable<TSource> source,
-            Func<TSource, TKey> keySelector)
-        {
-            return GroupAdjacent(source, keySelector, null);
-        }
 
         static IEnumerable<IGrouping<TKey, TSource>> GroupAdjacent<TSource, TKey>(
             this IEnumerable<TSource> source,

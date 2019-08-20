@@ -16,7 +16,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		pack.cmd = pack.cmd
 		pack.sh = pack.sh
 		README.md = README.md
+		test.cmd = test.cmd
+		test.sh = test.sh
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gini.Tests", "tests\Gini.Tests.csproj", "{DAB2AADD-6C2B-4837-82BE-FB94FC3F3DB6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -40,6 +44,18 @@ Global
 		{D764FB53-1350-4D5E-8F00-547CB2332946}.Release|x64.Build.0 = Release|Any CPU
 		{D764FB53-1350-4D5E-8F00-547CB2332946}.Release|x86.ActiveCfg = Release|Any CPU
 		{D764FB53-1350-4D5E-8F00-547CB2332946}.Release|x86.Build.0 = Release|Any CPU
+		{DAB2AADD-6C2B-4837-82BE-FB94FC3F3DB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DAB2AADD-6C2B-4837-82BE-FB94FC3F3DB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DAB2AADD-6C2B-4837-82BE-FB94FC3F3DB6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{DAB2AADD-6C2B-4837-82BE-FB94FC3F3DB6}.Debug|x64.Build.0 = Debug|Any CPU
+		{DAB2AADD-6C2B-4837-82BE-FB94FC3F3DB6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DAB2AADD-6C2B-4837-82BE-FB94FC3F3DB6}.Debug|x86.Build.0 = Debug|Any CPU
+		{DAB2AADD-6C2B-4837-82BE-FB94FC3F3DB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DAB2AADD-6C2B-4837-82BE-FB94FC3F3DB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DAB2AADD-6C2B-4837-82BE-FB94FC3F3DB6}.Release|x64.ActiveCfg = Release|Any CPU
+		{DAB2AADD-6C2B-4837-82BE-FB94FC3F3DB6}.Release|x64.Build.0 = Release|Any CPU
+		{DAB2AADD-6C2B-4837-82BE-FB94FC3F3DB6}.Release|x86.ActiveCfg = Release|Any CPU
+		{DAB2AADD-6C2B-4837-82BE-FB94FC3F3DB6}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
