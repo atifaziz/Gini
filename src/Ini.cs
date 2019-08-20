@@ -57,14 +57,12 @@ namespace Gini
             }
 
             // ReSharper disable once MemberHidesStaticFromOuterClass
-            public static IEnumerable<T> Parse<T>(string ini, Func<string, string, string, T> selector)
-            {
-                return from Match m in Regex.Matches(ini ?? string.Empty)
-                       select m.Groups into g
-                       select selector(g[SectionNumber].Value.TrimEnd(),
-                                       g[KeyNumber].Value.TrimEnd(),
-                                       g[ValueNumber].Value.TrimEnd());
-            }
+            public static IEnumerable<T> Parse<T>(string ini, Func<string, string, string, T> selector) =>
+                from Match m in Regex.Matches(ini ?? string.Empty)
+                select m.Groups into g
+                select selector(g[SectionNumber].Value.TrimEnd(),
+                                g[KeyNumber].Value.TrimEnd(),
+                                g[ValueNumber].Value.TrimEnd());
         }
 
         public static IEnumerable<IGrouping<string, KeyValuePair<string, string>>> Parse(string ini) =>
