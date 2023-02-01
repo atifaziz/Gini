@@ -37,20 +37,33 @@ namespace Gini
 
     static partial class Ini
     {
-        static class Parser
+        static partial class Parser
         {
             static readonly Regex Regex;
             static readonly int SectionNumber;
             static readonly int KeyNumber;
             static readonly int ValueNumber;
 
+            const string RegexPattern = /*lang=regex*/
+                @"^ *(\[(?<s>[a-z0-9-._][a-z0-9-._ ]*)\]|(?<k>[a-z0-9-._][a-z0-9-._ ]*)= *(?<v>[^\r\n]*))\s*$";
+
+            const RegexOptions RegexPatternOptions = RegexOptions.Multiline
+                                                   | RegexOptions.IgnoreCase
+                                                   | RegexOptions.CultureInvariant;
+
+#if GENERATED_REGEX
+            [GeneratedRegex(RegexPattern, RegexPatternOptions)]
+            private static partial Regex GetRegex();
+#endif
+
             static Parser()
             {
                 var re = Regex =
-                    new Regex(@"^ *(\[(?<s>[a-z0-9-._][a-z0-9-._ ]*)\]|(?<k>[a-z0-9-._][a-z0-9-._ ]*)= *(?<v>[^\r\n]*))\s*$",
-                        RegexOptions.Multiline
-                        | RegexOptions.IgnoreCase
-                        | RegexOptions.CultureInvariant);
+#if GENERATED_REGEX
+                    GetRegex();
+#else
+                    new Regex(RegexPattern, RegexPatternOptions);
+#endif
                 SectionNumber = re.GroupNumberFromName("s");
                 KeyNumber = re.GroupNumberFromName("k");
                 ValueNumber = re.GroupNumberFromName("v");

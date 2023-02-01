@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard1.0</TargetFrameworks>
+    <TargetFrameworks>net7.0;netstandard2.0;netstandard1.0</TargetFrameworks>
     <LangVersion>7.3</LangVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <VersionPrefix>2.0.0</VersionPrefix>
@@ -18,6 +18,11 @@
     <IncludeSource>true</IncludeSource>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <EmbedAllSources />
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' != 'netstandard1.0' And '$(TargetFramework)' != 'netstandard2.0'">
+    <LangVersion>11</LangVersion>
+    <DefineConstants>$(DefineConstants);GENERATED_REGEX</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
