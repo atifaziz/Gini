@@ -18,11 +18,9 @@ install:
 before_build:
 - dotnet --info
 build_script:
-- ps: >-
+- ps: |
     $id = $env:APPVEYOR_REPO_COMMIT_TIMESTAMP -replace '([-:]|\.0+Z)', ''
-
     $id = $id.Substring(0, 13)
-
     if ($isWindows) { .\pack.cmd ci-$id } else { ./pack.sh ci-$id }
 artifacts:
 - path: dist\*.nupkg
