@@ -8,8 +8,8 @@ skip_commits:
     - '*.txt'
 skip_tags: true
 install:
-- cmd: curl -O https://dot.net/v1/dotnet-install.ps1
-- sh: curl -O https://dot.net/v1/dotnet-install.sh
+- cmd: curl -OL https://dot.net/v1/dotnet-install.ps1
+- sh: curl -OL https://dot.net/v1/dotnet-install.sh
 - sh: chmod +x dotnet-install.sh
 - ps: |
     $sdkVersion = (type .\global.json | ConvertFrom-Json).sdk.version
