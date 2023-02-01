@@ -12,9 +12,8 @@ install:
 - sh: curl -OL https://dot.net/v1/dotnet-install.sh
 - sh: chmod +x dotnet-install.sh
 - ps: |
-    $sdkVersion = (type .\global.json | ConvertFrom-Json).sdk.version
-    if ($isWindows) { ./dotnet-install.ps1 -Version $sdkVersion }
-    if ($isLinux)   { ./dotnet-install.sh --version $sdkVersion }
+    if ($isWindows) { ./dotnet-install.ps1 -JsonFile global.json }
+    if ($isLinux)   { ./dotnet-install.sh --jsonfile global.json }
 - sh: export PATH="$HOME/.dotnet:$PATH"
 before_build:
 - dotnet --info
